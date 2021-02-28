@@ -20,6 +20,17 @@ provider:
     SECONDARY_INDEX: ToDo-Indx-User-${self:provider.stage}
     INDEX_BY_ID: ToDo-Indx-Id-${self:provider.stage}
   
+  tracing:
+    lambda: true
+    apiGateway: true
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'xray:PutTraceSegments'
+        - 'xray:PutTelemetryRecords'
+      Resource:
+        - '*' 
+  
 functions:
 
   Auth:
