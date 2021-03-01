@@ -5,6 +5,7 @@ plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
   - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
 
 provider:
   name: aws
@@ -31,6 +32,18 @@ provider:
       Resource:
         - '*' 
   
+
+custom:
+  documentation:
+    api:
+      info:
+        version: 1.0.0
+        title: Todo List API
+        description: Serverless API for Todo List Application
+    models:
+      - name: CreateTodoRequest
+        contentType: application/json
+        schema: ${file(src/models/createTodoRequestSchema.json)}
 functions:
 
   Auth:
@@ -68,6 +81,12 @@ functions:
           path: todos
           cors: true
           reqValidatorName: RequestBodyValidator
+          documentation: 
+            summary: Creates a new todo item
+            description: Creates a new todo item
+            requestModels:
+              'application/json': CreateTodoRequest
+              
     iamRoleStatements:
       - Effect: Allow
         Action:
