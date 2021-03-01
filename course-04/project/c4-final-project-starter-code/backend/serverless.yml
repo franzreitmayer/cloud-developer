@@ -173,15 +173,6 @@ resources:
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.TODO_TABLE}
-        GlobalSecondaryIndexes:
-          -
-            IndexName: ${self:provider.environment.INDEX_BY_ID}
-            KeySchema:
-              -
-                AttributeName: todoId
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
         LocalSecondaryIndexes:
           - IndexName: ${self:provider.environment.SECONDARY_INDEX}
             KeySchema:
