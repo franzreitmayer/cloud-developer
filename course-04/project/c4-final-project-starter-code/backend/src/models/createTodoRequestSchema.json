@@ -3,16 +3,16 @@
     "title": "createTodoItem",
     "type": "object",
     "properties": {
-      "name": {
-        "type": "string",
-        "minLength": 1
-      },
-      "dueDate": {
-        "type": "string"
-      }
+        "name": {
+            "type": "string",
+            "minLength": 1
+        },
+        "dueDate": {
+            "type": "string"
+        }
     },
     "required": [
-      "name"
+        "name"
     ],
     "additionalProperties": true
-  }
+}

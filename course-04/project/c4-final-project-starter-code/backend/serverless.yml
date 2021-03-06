@@ -31,7 +31,13 @@ provider:
         - 'xray:PutTelemetryRecords'
       Resource:
         - '*' 
-  
+    - Effect: Allow
+      Action:
+        - 'logs:PutLogEvents'
+        - 'logs:CreateLogStream'
+        - 'logs:CreateLogGroup'
+      Resource:
+        - '*'  
 
 custom:
   documentation:
@@ -48,6 +54,15 @@ functions:
 
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
+
 
   # TODO: Configure this function
   GetTodos:
@@ -69,6 +84,13 @@ functions:
           - dynamodb:Scan
           - dynamodb:Query
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODO_TABLE}/*
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
           
 
   # TODO: Configure this function
@@ -81,18 +103,25 @@ functions:
           path: todos
           cors: true
           reqValidatorName: RequestBodyValidator
-          documentation: 
-            summary: Creates a new todo item
-            description: Creates a new todo item
+          documentation:
+            summary: Create a new group
+            description: Create a new group
             requestModels:
               'application/json': CreateTodoRequest
-              
+
     iamRoleStatements:
       - Effect: Allow
         Action:
           - dynamodb:Query
           - dynamodb:PutItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODO_TABLE}
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
 
   # TODO: Configure this function
   UpdateTodo:
@@ -108,6 +137,13 @@ functions:
         Action:
           - dynamodb:UpdateItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODO_TABLE}
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
 
   # TODO: Configure this function
   DeleteTodo:
@@ -123,6 +159,13 @@ functions:
         Action:
           - dynamodb:DeleteItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODO_TABLE}
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
 
 
   # TODO: Configure this function
@@ -144,6 +187,13 @@ functions:
         Action:
           - dynamodb:UpdateItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODO_TABLE}
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
 
 resources:
   Resources:
