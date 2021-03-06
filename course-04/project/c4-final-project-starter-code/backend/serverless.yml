@@ -5,6 +5,7 @@ plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
   - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
 
 provider:
   name: aws
@@ -20,10 +21,48 @@ provider:
     SECONDARY_INDEX: ToDo-Indx-User-${self:provider.stage}
     INDEX_BY_ID: ToDo-Indx-Id-${self:provider.stage}
   
+  tracing:
+    lambda: true
+    apiGateway: true
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'xray:PutTraceSegments'
+        - 'xray:PutTelemetryRecords'
+      Resource:
+        - '*' 
+    - Effect: Allow
+      Action:
+        - 'logs:PutLogEvents'
+        - 'logs:CreateLogStream'
+        - 'logs:CreateLogGroup'
+      Resource:
+        - '*'  
+
+custom:
+  documentation:
+    api:
+      info:
+        version: 1.0.0
+        title: Todo List API
+        description: Serverless API for Todo List Application
+    models:
+      - name: CreateTodoRequest
+        contentType: application/json
+        schema: ${file(src/models/createTodoRequestSchema.json)}
 functions:
 
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
+
 
   # TODO: Configure this function
   GetTodos:
@@ -45,6 +84,13 @@ functions:
           - dynamodb:Scan
           - dynamodb:Query
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODO_TABLE}/*
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
           
 
   # TODO: Configure this function
@@ -57,12 +103,25 @@ functions:
           path: todos
           cors: true
           reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Create a new group
+            description: Create a new group
+            requestModels:
+              'application/json': CreateTodoRequest
+
     iamRoleStatements:
       - Effect: Allow
         Action:
           - dynamodb:Query
           - dynamodb:PutItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODO_TABLE}
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
 
   # TODO: Configure this function
   UpdateTodo:
@@ -78,6 +137,13 @@ functions:
         Action:
           - dynamodb:UpdateItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODO_TABLE}
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
 
   # TODO: Configure this function
   DeleteTodo:
@@ -93,6 +159,13 @@ functions:
         Action:
           - dynamodb:DeleteItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODO_TABLE}
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
 
 
   # TODO: Configure this function
@@ -114,6 +187,13 @@ functions:
         Action:
           - dynamodb:UpdateItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODO_TABLE}
+      - Effect: Allow
+        Action:
+          - 'logs:PutLogEvents'
+          - 'logs:CreateLogStream'
+          - 'logs:CreateLogGroup'
+        Resource:
+          - '*' 
 
 resources:
   Resources:
@@ -143,15 +223,6 @@ resources:
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.TODO_TABLE}
-        GlobalSecondaryIndexes:
-          -
-            IndexName: ${self:provider.environment.INDEX_BY_ID}
-            KeySchema:
-              -
-                AttributeName: todoId
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
         LocalSecondaryIndexes:
           - IndexName: ${self:provider.environment.SECONDARY_INDEX}
             KeySchema:
